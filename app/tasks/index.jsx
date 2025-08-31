@@ -1,11 +1,18 @@
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Modal, TextInput } from "react-native";
 import { Swipeable }  from "react-native-gesture-handler"
 import { Color } from "../../constants/colors";
 import { AntDesign } from "@expo/vector-icons"
 import React, {useState} from "react";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 export default function TaskScreen() {
     const [currentDate, setCurrentDate] = useState(new Date());
+    const [modalVisible, setModalVisible] = useState(false);
+    const [taskName, setTaskName] = useState("");
+    const [taskDate, setTaskDate] = useState(new Date());
+    const [taskTime, setTaskTime] = useState(new Date());
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [showTimePicker, setShowTimePicker] = useState(false);
 
     const formattedDate = currentDate.toLocaleDateString("en-GB", {
         weekday: "short",
@@ -39,7 +46,7 @@ export default function TaskScreen() {
             name: "Study Physics notes",
             time: "3:00 PM",
             creator: "Alice",
-            completed: true,
+            completed: false,
         },
     ])
 
@@ -83,6 +90,29 @@ export default function TaskScreen() {
         </Swipeable>
     );
 
+    const showModal = () => {
+        setModalVisible(true);
+    }
+
+    const addTask = (taskSelected, dateSelected, timeSelected) => {
+        if (!taskSelected.trim()) {alert("Please enter a task name!"); return;}
+        let newId = tasks.map(task => Number(task.id)).sort((a, b) => a - b).length + 1
+
+        const newTask = {
+            id: newId,
+            name: taskSelected,
+            time: timeSelected.toLocaleTimeString([], {hour: "2-digit", minute: "2-digit"}),
+            creator: "You",
+            completed: false,
+        }
+
+        setTasks(prevTasks => [...prevTasks, newTask]);
+        setModalVisible(false)
+        setTaskName("");
+        setTaskDate(new Date())
+        setTaskTime(new Date())
+    }
+
   return (
     <View style={styles.entire}>
 
@@ -119,6 +149,78 @@ export default function TaskScreen() {
                 contentContainerStyle={{ paddingBottom: 20 }}
             />
         </View>
+
+        <View style={styles.addTask}>
+            <TouchableOpacity style={styles.addBar} onPress={showModal}>
+                <AntDesign name="pluscircleo" size={45} color={Color.textOnPrimary}></AntDesign>
+            </TouchableOpacity>
+        </View>
+
+        <Modal visible={modalVisible} animationType="fade" transparent={true} onRequestClose={() => setModalVisible(false)}>
+            <View style={styles.popup}>
+                <View style={styles.popupBox}>
+                    <TouchableOpacity style={styles.close} onPress={() => setModalVisible(false)}>
+                        <AntDesign name="closecircleo" size={30} color={Color.textPrimary}></AntDesign>
+                    </TouchableOpacity>
+
+                    <Text style={styles.popupText}>Create Task</Text>
+                    <Text style={styles.popupInfo}>Task*</Text>
+                    <TextInput style={styles.textInp}
+                    placeholder="Complete Project..."
+                    placeholderTextColor={Color.textSecondary}
+                    value={taskName} 
+                    onChangeText={setTaskName}/>
+
+                    <View style={styles.DateTimePickers}>
+                        <View style={styles.popupPicker}>
+                            <Text style={styles.popupInfo}>Date*</Text>
+                            <TouchableOpacity style={styles.inpType} onPress={() => setShowDatePicker(true)}>
+                                <Text>{taskDate.toDateString()}</Text>
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.popupPicker}>
+                            <Text style={styles.popupInfo}>Time*</Text>
+                            <TouchableOpacity style={styles.inpType} onPress={() => setShowTimePicker(true)}>
+                                <Text>{taskTime.toLocaleTimeString([], {hour : "2-digit", minute: "2-digit"})}</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+
+                    <TouchableOpacity style={styles.addButton} onPress={() => addTask(taskName, taskDate, taskTime)}>
+                        <Text style={styles.addText}>Add Task</Text>
+                        <AntDesign name="enter" color={Color.textOnPrimary} size={24}></AntDesign>
+                    </TouchableOpacity>
+
+                    {showDatePicker && (
+                        <DateTimePicker
+                            value={taskDate}
+                            mode="date"
+                            display="default"
+                            onChange={(event, selectedDate) => {
+                            setShowDatePicker(false);
+                            if (selectedDate) setTaskDate(selectedDate);
+                            }}
+                        />
+                    )}
+
+                    {showTimePicker && (
+                        <DateTimePicker
+                            value={taskTime}
+                            mode="time"
+                            is24Hour={true}
+                            display="default"
+                            onChange={(event, selectedTime) => {
+                            setShowTimePicker(false);
+                            if (selectedTime) setTaskTime(selectedTime);
+                            }}
+                        />
+                    )}
+
+
+                </View>
+            </View>
+        </Modal>
     </View>
   );
 }
@@ -178,7 +280,7 @@ const styles = StyleSheet.create({
 
     dateText: {
         fontSize: 16,
-        fontWeight: 300,
+        fontWeight: "300",
         color: Color.textPrimary,
     },
 
@@ -259,5 +361,120 @@ const styles = StyleSheet.create({
         width: 70,
         borderRadius: 15,
         height: "88%",
+    },
+
+    addTask: {
+        position: "absolute",
+        bottom: 50, 
+        justifyContent: "center",
+        alignItems: "center",
+    },
+
+    addBar: {
+        justifyContent: "center",
+        alignItems: "center",
+        width: 75,
+        height: 75,
+        borderRadius: 37.5,
+        backgroundColor: Color.primary,
+    },
+
+    popup: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "rgba(0, 0, 0, 0.5)"
+    },
+
+    popupBox: {
+        width: 300,
+        padding: 20,
+        borderRadius: 10,
+        backgroundColor: Color.card,
+        elevation: 5,
+        position: "relative",
+    },
+
+    close: {
+        position: "absolute",
+        top: -10,
+        right: -10,
+        backgroundColor: Color.textSecondary,
+        borderRadius: 15,
+    },
+
+    popupText: {
+        fontWeight: 800,
+        fontSize: 20,
+        marginBottom: 20,
+    },
+    
+    popupInfo: {
+        color: Color.textSecondary,
+        fontWeight: 500,
+    },
+
+    textInp: {
+        width: "100%",
+        height: 50,
+        backgroundColor: Color.background,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: "#ccc",
+        paddingHorizontal: 15,
+        fontSize: 16,
+        color: "#333",
+        shadowColor: "#474747ff",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
+        elevation: 2,
+        marginVertical: 5,
+    },
+
+    DateTimePickers: {
+        width: "100%",
+        flexDirection: "row",
+        justifyContent: "space-between"
+    },
+
+    popupPicker: {
+        flexDirection: "column"
+    },
+
+    inpType: {
+        width: "100%",
+        backgroundColor: Color.background,
+        height: 45,
+        borderWidth: 1,
+        borderColor: "#ccc",
+        borderRadius: 8,
+        justifyContent: "center",
+        paddingHorizontal: 10,
+        marginTop: 10,
+        marginBottom: 10,
+    },
+
+    addButton: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: Color.primary,
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        borderRadius: 10,
+        marginTop: 15,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+
+    addText: {
+        color: Color.textOnPrimary,
+        fontSize: 16,
+        fontWeight: "900",
+        marginRight: 10,
     },
 })
