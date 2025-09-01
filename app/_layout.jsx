@@ -33,6 +33,12 @@ export default function index() {
           title: "Stats",
         }}
       />
+      <Tabs.Screen
+        name="tasks"
+        options={{
+          title: "Tasks",
+        }}
+      />
     </Tabs>
   );
 }
