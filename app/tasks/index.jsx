@@ -67,20 +67,19 @@ export default function TaskScreen() {
         </TouchableOpacity>
     )
 
+    const renderLeftActions = (id) => (
+        <TouchableOpacity style={styles.completeButton} onPress={() => toggleComplete(id)}>
+            <AntDesign name="checkcircle" size={28} color="white" />
+        </TouchableOpacity>
+    );
+
     const renderTask = ({ item }) => (
-        <Swipeable renderRightActions={() => renderRightActions(item.id)}>
+        <Swipeable renderRightActions={() => renderRightActions(item.id)} renderLeftActions={() => renderLeftActions(item.id)} >
             <View style={styles.taskCard}>
                 <View style={styles.topRow}>
                     <Text style={[ styles.taskName, item.completed && { textDecorationLine: "line-through", opacity: 0.5 }, ]} >
                         {item.name}
                     </Text>
-                    <TouchableOpacity style={styles.completeButton} onPress={() => toggleComplete(item.id)} >
-                        {item.completed ? (
-                        <AntDesign name="checkcircle" size={28} color="green" />
-                        ) : (
-                        <AntDesign name="checkcircleo" size={28} color="gray" />
-                        )}
-                    </TouchableOpacity>
                 </View>
                 <Text style={styles.metaText}>
                 {item.time} • {item.creator}
@@ -359,6 +358,15 @@ const styles = StyleSheet.create({
         width: 70,
         borderRadius: 15,
         height: "88%",
+    },
+
+    completeButton: {
+        backgroundColor: Color.accent3,
+        justifyContent: "center",
+        alignItems: "center",
+        width: 70,
+        borderRadius: 15,
+        height: "88%"
     },
 
     addTask: {
