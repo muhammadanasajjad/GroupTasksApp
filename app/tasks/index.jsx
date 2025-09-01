@@ -1,9 +1,10 @@
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Modal, TextInput } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Modal, TextInput, Dimensions } from "react-native";
 import { Swipeable }  from "react-native-gesture-handler"
 import { Color } from "../../constants/colors";
 import { AntDesign } from "@expo/vector-icons"
 import React, {useState} from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
+const width = Dimensions.get("window").width;
 
 export default function TaskScreen() {
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -13,7 +14,22 @@ export default function TaskScreen() {
     const [taskTime, setTaskTime] = useState(new Date());
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showTimePicker, setShowTimePicker] = useState(false);
-
+    const [tasks, setTasks] = useState([
+        {
+            id: "1",
+            name: "Finish React Native project",
+            time: "10:00 AM",
+            creator: "John",
+            completed: false,
+        },
+        {
+            id: "2",
+            name: "Study Physics notes",
+            time: "3:00 PM",
+            creator: "Alice",
+            completed: false,
+        },
+    ])
     const formattedDate = currentDate.toLocaleDateString("en-GB", {
         weekday: "short",
         day: "numeric",
@@ -32,23 +48,6 @@ export default function TaskScreen() {
         newDate.setDate(currentDate.getDate() - 1);
         setCurrentDate(newDate);
     }
-
-    const [tasks, setTasks] = useState([
-        {
-            id: "1",
-            name: "Finish React Native project",
-            time: "10:00 AM",
-            creator: "John",
-            completed: false,
-        },
-        {
-            id: "2",
-            name: "Study Physics notes",
-            time: "3:00 PM",
-            creator: "Alice",
-            completed: false,
-        },
-    ])
 
     const toggleComplete = (id) => {
         setTasks((prev) => 
@@ -96,7 +95,7 @@ export default function TaskScreen() {
 
     const addTask = (taskSelected, dateSelected, timeSelected) => {
         if (!taskSelected.trim()) {alert("Please enter a task name!"); return;}
-        let newId = tasks.map(task => Number(task.id)).sort((a, b) => a - b).length + 1
+        const newId = tasks.length ? Math.max(...tasks.map(task => Number(task.id))) + 1 : 1;
 
         const newTask = {
             id: newId,
@@ -137,7 +136,7 @@ export default function TaskScreen() {
             <Text style={styles.personalText}>Personal Tasks</Text>
             <TouchableOpacity style={styles.changeGroupButton}>
                 <Text style={styles.changeGroupText}>Change Group</Text>
-                <AntDesign name="swap" size={30} color={Color.textPrimary}></AntDesign>
+                <AntDesign name="swap" size={30} color={Color.textOnPrimary}></AntDesign>
             </TouchableOpacity>
         </View>
 
@@ -254,7 +253,7 @@ const styles = StyleSheet.create({
     leftButton: {
         paddingHorizontal: 10,
         paddingVertical: 5,
-        backgroundColor: Color.primary,
+        backgroundColor: Color.secondary,
         borderTopLeftRadius: 25,
         borderBottomLeftRadius: 25,
         justifyContent: "center",
@@ -265,7 +264,7 @@ const styles = StyleSheet.create({
     rightButton: {
         paddingHorizontal: 10,
         paddingVertical: 5,
-        backgroundColor: Color.primary,
+        backgroundColor: Color.secondary,
         borderTopRightRadius: 25,
         borderBottomRightRadius: 25,
         justifyContent: "center",
@@ -307,18 +306,17 @@ const styles = StyleSheet.create({
     changeGroupButton: {
         width: 150,
         height: 40,
-        backgroundColor: Color.buttonColor,
+        backgroundColor: Color.primary,
         borderRadius: 8,
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-around",
         paddingHorizontal: 10,
-        opacity: 0.7
     },
 
     changeGroupText: {
         fontWeight: 900,
-        color: Color.textPrimary,
+        color: Color.textOnPrimary,
     },
 
     taskCard: {
@@ -331,7 +329,7 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 3 },
         shadowRadius: 4,
         elevation: 2,
-        width: "100%"
+        width: width * 0.85
     },
 
     topRow: {
@@ -376,7 +374,7 @@ const styles = StyleSheet.create({
         width: 75,
         height: 75,
         borderRadius: 37.5,
-        backgroundColor: Color.primary,
+        backgroundColor: Color.secondary,
     },
 
     popup: {
