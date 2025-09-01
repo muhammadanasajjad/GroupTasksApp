@@ -633,14 +633,23 @@ const styles = StyleSheet.create({
     color: Colours.defaultText,
   },
 
-  deleteButton: {
-    backgroundColor: Colours.accent2,
-    justifyContent: "center",
-    alignItems: "center",
-    width: 70,
-    borderRadius: 15,
-    height: "88%",
-  },
+    deleteButton: {
+        backgroundColor: Color.accent2,
+        justifyContent: "center",
+        alignItems: "center",
+        width: 70,
+        borderRadius: 15,
+        height: "88%",
+    },
+
+    completeButton: {
+        backgroundColor: Color.accent3,
+        justifyContent: "center",
+        alignItems: "center",
+        width: 70,
+        borderRadius: 15,
+        height: "88%"
+    },
 
   addTask: {
     minWidth: "100%",
