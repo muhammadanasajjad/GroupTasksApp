@@ -9,7 +9,7 @@ import {
   Dimensions,
 } from "react-native";
 import { ScrollView, Swipeable } from "react-native-gesture-handler";
-import { Color as Colours } from "../../constants/colors";
+import { Color, Color as Colours } from "../../constants/colors";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -108,13 +108,13 @@ export default function TaskScreen() {
 
   const nextDate = () => {
     const newDate = new Date(currentDate);
-    newDate.setDate(currentDate.getDate() + 1);
+    newDate.setDate(currentDate.getDate() + 7);
     setCurrentDate(newDate);
   };
 
   const prevDate = () => {
     const newDate = new Date(currentDate);
-    newDate.setDate(currentDate.getDate() - 1);
+    newDate.setDate(currentDate.getDate() - 7);
     setCurrentDate(newDate);
   };
 
@@ -132,13 +132,13 @@ export default function TaskScreen() {
 
   const renderRightActions = (task) => (
     <TouchableOpacity
-      style={styles.deleteButton}
+      style={!task.completed ? styles.completeButton : styles.deleteButton}
       onPress={() => toggleComplete(task.id)}
     >
       <AntDesign
         name={!task.completed ? "check" : "close"}
         size={24}
-        color={!task.completed ? Colours.success : Colours.failure}
+        color={Colours.primaryText}
       />
     </TouchableOpacity>
   );
@@ -161,6 +161,7 @@ export default function TaskScreen() {
 
     return (
       <Swipeable
+        key={task.id}
         renderRightActions={() => renderRightActions(task)}
         onSwipeableOpen={(dir) => {
           // if (dir === "right") toggleComplete(task.id);
@@ -244,6 +245,12 @@ export default function TaskScreen() {
   return (
     <View style={styles.entire}>
       <ScrollView style={{ width: "100%", height: "100%" }}>
+
+        <View style={styles.topHeader}>
+          <Ionicons name="checkmark-done-circle-outline" color={Colours.primary} size={40}></Ionicons>
+          <Text style={styles.topHeaderText}>Tasks</Text>
+        </View>
+
         <View style={styles.header}>
           <View style={styles.taskCounter}>
             <View
@@ -322,6 +329,7 @@ export default function TaskScreen() {
               </View>
             </View>
           </View>
+
           {tasks.filter((task) => !task.completed).length == 0 && (
             <Text
               style={{ width: "100%", textAlign: "center", marginBottom: 12 }}
@@ -381,6 +389,7 @@ export default function TaskScreen() {
           )}
           {completedTasks.map(renderTask)}
         </View>
+
       </ScrollView>
 
       <View style={styles.addTask}>
@@ -449,6 +458,15 @@ export default function TaskScreen() {
               </View>
             </View>
 
+            <Text style={styles.popupInfo}>Group*</Text>
+            <TextInput
+              style={styles.textInp}
+              placeholder="Group..."
+              placeholderTextColor={Colours.textSecondary}
+              value={taskName}
+              onChangeText={setTaskName}
+            />
+
             <TouchableOpacity
               style={styles.addButton}
               onPress={() => addTask(taskName, taskDate, taskTime)}
@@ -456,7 +474,7 @@ export default function TaskScreen() {
               <Text style={styles.addText}>Add Task</Text>
               <AntDesign
                 name="enter"
-                color={Colours.textOnPrimary}
+                color={Colours.primaryText}
                 size={24}
               ></AntDesign>
             </TouchableOpacity>
@@ -497,7 +515,24 @@ const styles = StyleSheet.create({
     position: "relative",
     flex: 1,
     backgroundColor: Colours.background,
-    padding: 20,
+  },
+
+  topHeader: {
+    backgroundColor: Colours.background,
+    borderBottomColor: "#65656535",
+    borderBottomWidth: 1,
+    marginBottom: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    paddingLeft: 15
+  },
+
+  topHeaderText: {
+    color: Colours.defaultText,
+    fontWeight: 500,
+    fontSize: 26,
+    paddingLeft: 10
   },
 
   header: {
@@ -602,6 +637,9 @@ const styles = StyleSheet.create({
   tasks: {
     width: "100%",
     height: "auto",
+    padding: 20,
+    paddingBottom: 0,
+    paddingTop: 5,
   },
   tasksLabelContainer: {
     flexDirection: "row",
@@ -628,24 +666,33 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 5,
   },
+
   tasksLabel: {
     fontSize: 18,
     color: Colours.defaultText,
   },
 
   deleteButton: {
-    backgroundColor: Colours.accent2,
-    justifyContent: "center",
-    alignItems: "center",
-    width: 70,
-    borderRadius: 15,
-    height: "88%",
+      backgroundColor: "#d50000d9",
+      justifyContent: "center",
+      alignItems: "center",
+      width: 70,
+      borderRadius: 15,
+      height: "88%",
+  },
+
+  completeButton: {
+      backgroundColor: "#3dd68cd9",
+      justifyContent: "center",
+      alignItems: "center",
+      width: 70,
+      borderRadius: 15,
+      height: "88%"
   },
 
   addTask: {
     minWidth: "100%",
     position: "absolute",
-    left: 20,
     bottom: 20,
     justifyContent: "center",
     alignItems: "center",
@@ -680,7 +727,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: -10,
     right: -10,
-    backgroundColor: Colours.textSecondary,
+    backgroundColor: Colours.grayText,
     borderRadius: 15,
   },
 
@@ -753,9 +800,37 @@ const styles = StyleSheet.create({
   },
 
   addText: {
-    color: Colours.textOnPrimary,
+    color: Colours.primaryText,
     fontSize: 16,
     fontWeight: "900",
     marginRight: 10,
+  },
+
+  pill: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+
+  leftButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: Colours.primary,
+    borderTopLeftRadius: 25,
+    borderBottomLeftRadius: 25,
+    justifyContent: "center",
+    alignItems: "center",
+    marginHorizontal: 10,
+  },
+
+  rightButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: Colours.primary,
+    borderTopRightRadius: 25,
+    borderBottomRightRadius: 25,
+    justifyContent: "center",
+    alignItems: "center",
+    marginHorizontal: 10,
   },
 });

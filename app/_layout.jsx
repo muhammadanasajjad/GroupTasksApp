@@ -19,7 +19,7 @@ export default function index() {
         lazy: false,
         // animation: "none",
       }}
-      initialRouteName="home"
+      initialRouteName="groups"
     >
       <Tabs.Screen
         name="home"
@@ -28,9 +28,9 @@ export default function index() {
         }}
       />
       <Tabs.Screen
-        name="stats"
+        name="groups"
         options={{
-          title: "Stats",
+          title: "Groups",
         }}
       />
       <Tabs.Screen
